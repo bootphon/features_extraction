@@ -1,0 +1,34 @@
+# To run this makefile, you must provide your system specific EXT and MATLABROOT
+# variables on the command line e.g.:
+#
+# make -f Makefile_unix MATLABROOT="/usr/local/MATLAB/R2011a"  EXT=mexa64 
+
+ifndef MATLABROOT
+  $(warning MATLABROOT variable is udefined. Using default MATLABROOT="C:\Program Files\MATLAB\R2011b" )
+  MATLABROOT=/usr/local/MATLAB/R2011a
+endif
+
+ifndef EXT
+  $(warning EXT variable is udefined. Using default EXT=mexa64 )
+  EXT=mexa64
+endif
+
+ifndef PORTAUDIO
+  PORTAUDIO=portaudio
+endif
+
+MEXTGT=playrec.$(EXT)
+MEXSRC=mex_dll_core.c pa_dll_playrec.c
+LIBS= -L. -L"$(MATLABROOT)/bin/glnxa64" -lmex -lmx -l$(PORTAUDIO)
+INCLUDES= -I"$(MATLABROOT)/extern/include" -I. -I../../src/thirdparty
+
+CC=gcc
+
+all:
+	$(CC) -fPIC -std=c99 -s -O3 -Wall -shared $(INCLUDES) $(MEXSRC) $(LIBS) -o $(MEXTGT) 
+
+clean:
+	-rm $(MEXTGT)
+
+.PHONY: all clean
+

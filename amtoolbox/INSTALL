@@ -1,0 +1,29 @@
+
+--------- Running the toolbox --------------------
+
+AMToolbox depends on LTFAT.  You must first download LTFAT from
+http://ltfat.sourceforge.net/ and unpack the downloaded file.
+
+To start LTFAT in Matlab or Octave type "ltfatstart" as the first
+command from the installation directory. This will set up the correct
+paths. Similarly, type "amtstart" to start AMToolbox.
+
+In Octave you can put these commands in your ~/.octaverc file. In Matlab
+you can put these command in your startup.m file. Your startup file of
+choice should contain some lines like this:
+
+addpath /path/to/ltfat
+addpath /path/to/amtoolbox
+ltfatstart;
+amtstart;
+
+The "ltfatstart" and "amtstart" commands will add all the necessary
+subdirectories (so please don't add these manually), and will print
+statements telling you which backend you are currently using.
+
+-------- Compiling the toolbox ------- ------------
+
+If you wish to compile the C and Fortran functions in the toolbox,
+execute the "amtmex" command. This will execute all the necessary
+compilation scripts if you have the required compilers installed.
+

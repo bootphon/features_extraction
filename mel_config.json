@@ -1,0 +1,11 @@
+{
+    "features": "mel",
+    "alpha": 0.97,
+    "frate": 100,
+    "fs": 16000,
+    "lowerf": 100,
+    "upperf": 6855.4976,
+    "nfft": 512,
+    "nfilt": 13,
+    "wlen": 0.025
+}

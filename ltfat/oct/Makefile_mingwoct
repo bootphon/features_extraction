@@ -1,0 +1,72 @@
+# Use GNU Make to process this file.
+# mingw32-make -f Makefile_mingw32
+
+ifndef MATLABROOT
+  $(warning MATLABROOT variable is udefined. Using default (probably wrong) MATLABROOT="c:\Octave\Octave3.6.4_gcc4.6.2")
+  MATLABROOT=c:\Octave\Octave3.6.4_gcc4.6.2
+endif
+
+ifndef EXT
+  EXT=oct
+endif
+
+include ../src/ostools.mk
+
+OCTSCC   = \
+    comp_chirpzt \
+    comp_gga \
+    comp_filterbank_td \
+	comp_ifilterbank_td \
+	comp_atrousfilterbank_td \
+	comp_iatrousfilterbank_td \
+    comp_col2diag\
+	comp_dgt_fb \
+	comp_dct \
+	comp_dst \
+	comp_dgt_long \
+	comp_dgt_ola  \
+	comp_dgtreal_fb \
+	comp_dgtreal_long \
+	comp_dgtreal_ola \
+	comp_dwilt_long  \
+	comp_gabdual_long  \
+	comp_gabtight_long  \
+	comp_fftreal  \
+	comp_gabreassign  \
+	comp_heapint  \
+	comp_idgt_fac  \
+	comp_idgt_fb  \
+	comp_idgtreal_fac  \
+	comp_idgtreal_fb  \
+	comp_ifftreal  \
+	comp_iwfac \
+	comp_nonsepdgt_multi  \
+	comp_nonsepdgt_shear  \
+	comp_nonsepwin2multi  \
+	comp_pchirp  \
+	comp_pgauss  \
+	comp_ufilterbank_fft  \
+	comp_wfac \
+	comp_filterbank_fft \
+	comp_filterbank_fftbl \
+	comp_ifilterbank_fft \
+	comp_ifilterbank_fftbl \
+
+	
+OCTSBASE = $(basename $(OCTSCC))
+OCTS     = $(addsuffix .$(EXT),$(OCTSBASE))
+OCTAVEBIN = $(MATLABROOT)\bin
+OCTAVELIB = $(MATLABROOT)\lib
+ADDITIONALIBS = -L../lib -lltfat -lltfatf  -L$(OCTAVELIB) -lblas -lfftw3 -lfftw3f -llapack 
+
+
+all:	$(OCTS)
+
+%.$(EXT): %.cc
+	mkoctfile --strip -v -Wall "-Wl,-rpath,." -I../src/thirdparty -I. -I../src $(ADDITIONALIBS)  $<
+	del *.o
+
+clean:
+	del *.o *.$(EXT)
+
+.PHONY: all clean

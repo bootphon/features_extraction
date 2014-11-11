@@ -1,0 +1,28 @@
+!This module is shared by "Cochlea" and "CochleaDialog"
+
+MODULE FilesModule
+SAVE
+
+! File Handlers
+INTEGER, PARAMETER :: FH_PARAMETERS = 10
+INTEGER, PARAMETER :: FH_GAMMA = 20
+INTEGER, PARAMETER :: FH_FINALPOSITIONS = 30
+INTEGER, PARAMETER :: FH_FINALVELOCITIES = 40
+INTEGER, PARAMETER :: FH_PEARCAN = 100
+INTEGER, PARAMETER :: FH_PROFILE = 200
+INTEGER, PARAMETER :: FH_PROBING = 300
+INTEGER, PARAMETER :: FH_COCHLEA = 400
+
+! File Names
+CHARACTER(*), PARAMETER :: FN_PARAMETERS = 'parameters.dat'
+CHARACTER(*), PARAMETER :: FN_GAMMA = 'gamma.dat'
+CHARACTER(*), PARAMETER :: FN_FINALPOSITIONS = 'final_y.bin'
+CHARACTER(*), PARAMETER :: FN_FINALVELOCITIES = 'final_v.bin'
+
+INTEGER, PARAMETER :: READS = 0
+INTEGER, PARAMETER :: WRITES = 1
+LOGICAL ParameterFileSucceeded	!indicates whether last write/read parameters operation succeeded or not
+
+CHARACTER(9) writeFormat
+
+END MODULE FilesModule

@@ -1,0 +1,32 @@
+# Use GNU Make to process this file.
+
+ifndef EXT
+  EXT=oct
+endif
+
+OCTSCC   = $(shell ls comp_*.cc)
+OCTSBASE = $(basename $(OCTSCC))
+OCTS     = $(addsuffix .$(EXT),$(OCTSBASE))
+
+MKOCTFILE ?= mkoctfile
+
+ifndef LAPACK_LIBS
+LAPACK_LIBS := $(shell $(MKOCTFILE) -p LAPACK_LIBS)
+endif
+ifndef BLAS_LIBS
+BLAS_LIBS := $(shell $(MKOCTFILE) -p BLAS_LIBS)
+endif
+ifndef FLIBS
+FLIBS := $(shell $(MKOCTFILE) -p FLIBS)
+endif
+LFLAGS := $(shell $(MKOCTFILE) -p LFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+
+all:	$(OCTS)
+
+%.$(EXT): %.cc config.h
+	$(MKOCTFILE) -strip -Wall -I../thirdparty -I. -I../src -I../src/thirdparty -L../lib -lltfat -lltfatf $<
+
+clean:
+	rm *.o *.$(EXT)
+
+.PHONY: all clean

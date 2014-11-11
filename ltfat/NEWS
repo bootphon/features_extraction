@@ -1,0 +1,58 @@
+Version 1.4.3
+
+* Added chirped Z-transform
+
+* Block processing demos now work in Octave (on Linux)
+
+* New zoomig features for blockplot
+
+Version 1.4.2
+
+* The filterbanks algorithms are now much faster because all the algorithms have been implemented in the C backend
+  
+* franalasso can now use the the FISTA algorithm
+
+* A generalization of the Goertzel algorithm "gga" has been added". 
+
+Version 1.4.1
+
+* Major change in the output format from the wfilt_ functions
+
+* Experimental filter backend added to handle filters defined on the
+  frequency side.
+
+* Bugs fixed for mex interfaces compilation on Mac
+
+---------- LTFAT 1.4 ------------------------------------------
+
+The major feature of the 1.4 series is that the backend now also works
+in single precision. Work on the wavelet toolbox is still ongoing.
+
+---------- LTFAT 1.3 ------------------------------------------
+
+This is a development release. It is fully backwards compatible with
+the LTFAT version 1.0 and 1.2 series and contain bugfixes, but the
+contents of the "wavelets" subdirectory is in development, and the
+interfaces described herein may change during the 1.3 development
+cycle.
+
+---------- LTFAT 1.2 ------------------------------------------
+
+Version 1.2 is backwards comptatible with the 1.0 series, but
+introduces the "frames" framework, which is an object-oriented
+interface to the various frames in LTFAT. It does not actually use the
+object oriented features in Octave / Matlab, instead it uses a simple
+struct to keep track of things.
+
+-------- LTFAT 1.0 ---------------------------
+
+The Linear Time-Frequency Analysis Toolbox (LTFAT) is a free software
+toolbox (GPLv3) written in the Matlab/Octave scripting language. It
+comprises more than 200 different functions in the area of Fourier
+analysis, signal processing and time-frequency analysis.
+
+The toolbox can be downloaded from http://ltfat.sourceforge.net.
+
+The toolbox can be used for both educational, research and
+computational purposes. It has a backend implemented in C, which can
+be compiled to speed up all computational intensive functions.

@@ -1,0 +1,30 @@
+This is the Matlab Auditory Toolbox.  Version 2.
+
+First published by Apple Computer as Apple Technical Report #45.  This
+new version is published by Interval Research Corporation as TR #1998-010.
+
+I have put this collection of code together to support my own research.  I
+hope by adding documentation and testing everything that other researchers
+can also benefit from this work.
+
+Needless to say, support is limited.  I use this code, so I am interested
+in hearing bug reports.  I'll fix them if I can reproduce them and I have
+the time.  But no guarantees.  Sending bug fixes is a good way to make sure
+I pay attention.
+
+This archive contains ".m" files, some Matlab mex files, and the C sources
+needed to create the mex files.  I have tested this code on Macintosh, PC,
+SGI, and Sun computers running Matlab 5.2.  The code is reasonably 
+portable, so I don't expect any problems on any machine running Matlab.
+
+After installing this software on your machine, use the test_auditory
+script to run through the examples in the documentation.
+
+Please let me know if you have comments or questions.  I can be reached
+at 
+	Malcolm Slaney
+	Interval Research Corporation
+	1801 Page Mill Road, Building C
+	Palo Alto, CA 94304
+
+	malcolm@interval.com

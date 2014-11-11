@@ -1,0 +1,6 @@
+{
+    "features": "drnl",
+	"wlen": 0.010,
+	"frate": 100,
+	"fs": 44100
+}
