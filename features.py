@@ -27,13 +27,12 @@ import struct
 import numpy as np
 
 import spectral
-from oct2py import octave
 import logging
-from oct2py import Oct2Py, get_log
 import npz2h5features
 import shutil
 import scipy.io
 import glob
+import tempfile
 
 
 def resample(sig, ratio):
@@ -207,35 +206,38 @@ if __name__ == '__main__':
     tmp = False
     python = (feat == 'mel' or feat == 'mfcc')
     octave = (feat == 'rasta' or feat == 'lyon' or feat == 'drnl')
-    if (python and not npzdir) or (octave and not matdir):
-        outdir = os.getcwd() + '/tmp/'
-        if not os.path.exists(outdir):
-            os.makedirs(outdir)
+    try:
+        if (python and not npzdir) or (octave and not matdir):
+            outdir = tempfile.mkdtemp()
             tmp = True
+        elif python:
+            outdir = npzdir
+        elif matdir:
+            outdir = matdir
+            
+        if feat == 'mel':
+            del config['features']
+            encoder = spectral.CubicMel(**config)
+            convert(files, outdir, encoder, force)
+        elif feat == 'mfcc':
+            del config['features']
+            encoder = spectral.MFCC(**config)
+            convert(files, outdir, encoder, force)
         else:
-            print 'tmp folder already exists, please remove it'
-            exit()
-
-    if feat == 'mel':
-        del config['features']
-        encoder = spectral.CubicMel(**config)
-        convert(files, outdir, encoder, force)
-    elif feat == 'mfcc':
-        del config['features']
-        encoder = spectral.MFCC(**config)
-        convert(files, outdir, encoder, force)
-    else:
-        oc = Oct2Py(logger=get_log())
-        oc.logger = get_log('new_log')
-        oc.logger.setLevel(logging.INFO)
-        oc.call("features", files, outdir, feat, config_file, force,
-                verbose=True)
-        if npzdir:
-            outdir2 = npzdir
-        else:
-            outdir2 = outdir
-        mat2npz(outdir, outdir2)
-    if h5file:
-        npz2h5features.convert(outdir, h5file)
-    if tmp:
-        shutil.rmtree(outdir)
+            from oct2py import octave
+            from oct2py import Oct2Py, get_log
+            oc = Oct2Py(logger=get_log())
+            oc.logger = get_log('new_log')
+            oc.logger.setLevel(logging.INFO)
+            oc.call("features", files, outdir, feat, config_file, force,
+                    verbose=True)
+            if npzdir:
+                outdir2 = npzdir
+            else:
+                outdir2 = outdir
+            mat2npz(outdir, outdir2)
+        if h5file:
+            npz2h5features.convert(outdir, h5file)
+    finally:
+        if tmp:
+            shutil.rmtree(outdir)

@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+
+from distutils.core import setup
+
+setup(name='features_extraction',
+      version='1.0',
+      description='Speech features extraction in python',
+      author='Roland Thiolliere',
+      author_email='rolthiolliere@gmail.com',
+      packages=[],
+     )
