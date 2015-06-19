@@ -9,6 +9,7 @@ import logging
 import shlex
 import numpy as np
 import struct
+from kaldi_io import *
 # assert find_executable('compute-mfcc-feats'), "kaldi 'featsbin' not in the PATH"
 
 logging.basicConfig(level=logging.INFO)
