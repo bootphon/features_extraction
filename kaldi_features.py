@@ -26,18 +26,26 @@ def run(files, output_path, config_file, save, batch_size=50):
     -----------
     batch_size: int, max batch size in number of files (adjust for RAM usage)
     """
-    with open(config_file, 'r') as fid:
-        config = json.load(fid)
+    if 'h5' in save:
+        import h5features
+    # with open(config_file, 'r') as fid:
+    #     config = json.load(fid)
+    if config_file:
+        raise NotImplementedError
 
     batches = [files[i:i + batch_size] for i in range(0, len(files), batch_size)]
     res = {}
     for files_batch in batches:
-        res.update(extract_features(files_batch, delta=0))
-    if 'np' in save:
-        for f in res:
-            np.save(output_path + f, res[f])
-    if 'h5' in save:
-        raise NotImplementedError
+        new_res = extract_features(files_batch, delta=0)
+        if 'np' in save:
+            for f in new_res:
+                np.save(output_path + f, new_res[f])
+        if 'h5' in save:
+            h5features.write(output_path, 'features', [new_res.values()],
+                             map(lambda f: os.path.basename(f).split('.')[0],
+                                 new_res.keys()),
+                             map(lambda d: np.arange(d.shape[0], dtype=float) / 100 + 0.0125))
+        res.update(new_res)
 
 
 def extract_features(files, feature_type='mfcc', normalize=False,
@@ -77,7 +85,30 @@ def extract_features(files, feature_type='mfcc', normalize=False,
         return mfccs
     finally:
         tryremove(scpfn)
-        
+
+
+
+def extract_pitch(files, normalize=False,
+                  delta=2, pitch=False):
+    """Extract speech features using kaldi
+
+    Parameters:
+    files: list
+    normalize: bool, do mean variance normalization
+    delta: int, [0..2], 0 -> no deltas, 1 -> do deltas, 2 -> do delta+deltasdeltas
+    """
+    try:
+        # writing 'file path' in a .scp file for kaldi
+        def get_fname(path):
+            return os.path.basename(path).split('.')[0]
+        (scpid, scpfn) = tempfile.mkstemp()
+        with open(scpfn, 'w') as fout:
+            fout.write('\n'.join((' '.join([get_fname(f), f]) for f in files)))
+        pitches = compute_pitch(scpfn, delta)
+        return pitches
+    finally:
+        tryremove(scpfn)
+
 
 def tryremove(path):
     try:
