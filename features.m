@@ -39,21 +39,21 @@ for idx = 1:numel(wavfiles)
   out_file = strcat(out_folder, basename);
 
   if strcmp(feat, 'rasta')
-    addpath('rastamat');
-    fprintf('\trasta-plp\n');
-    sig2rasta(sig, fs, out_file, conf);
-    rmpath('rastamat');
+      %addpath('rastamat');            
+      %fprintf('\trasta-plp\n');           
+      sig2rasta(sig, fs, out_file, conf);
+      %rmpath('rastamat');
 
   elseif strcmp(feat, 'lyon')
-    addpath('AuditoryToolbox');
-    fprintf('\tlyonpassiveear\n');
-    sig2lyon(sig, fs, out_file, conf);
-    rmpath('AuditoryToolbox');
-  % fprintf('\tmelfcc\n');
-  % sig2mfcc(sig, fs, interval, basename, out_folder);
+      addpath('AuditoryToolbox');
+      %fprintf('\tlyonpassiveear\n');
+      sig2lyon(sig, fs, out_file, conf);
+      rmpath('AuditoryToolbox');
+      % fprintf('\tmelfcc\n');
+      % sig2mfcc(sig, fs, interval, basename, out_folder);
   elseif strcmp(feat, 'drnl')
-    fprintf('\tdrnl\n');
-    sig2drnl(sig,fs,out_file, conf);
+      %fprintf('\tdrnl\n');
+      sig2drnl(sig,fs,out_file, conf);
   end
 end
 pkg unload signal;

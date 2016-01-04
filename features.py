@@ -119,7 +119,7 @@ def convert(files, outdir, encoder, force):
                                               fid.readframes(nframes)))
             fid.close()
         except IOError:
-            print 'No such file:', f
+            print('No such file:', f)
             exit()
 
         if fs != encoder.config['fs']:
@@ -173,14 +173,15 @@ def mat2npz(indir, outdir):
                  features=mat['features'],
                  time=np.ravel(mat['center_times']))
 
-if __name__ == '__main__':
+
+def main():
     args = parse_args()
     config_file = args['config']
     try:
         with open(config_file, 'r') as fid:
             config = json.load(fid)
     except IOError:
-        print 'No such file: ', config_file
+        print('No such file: ', config_file)
         exit()
 
     force = args['force']
@@ -194,13 +195,13 @@ if __name__ == '__main__':
         h5file = feat + '.features'
 
     if h5file and os.path.exists(h5file):
-        print 'The output file already exists:', h5file
+        print('The output file already exists:', h5file)
         exit()
     if npzdir and not os.path.exists(npzdir):
-        print 'No such directory:', npzdir
+        print('No such directory:', npzdir)
         exit()
     if matdir and not os.path.exists(matdir):
-        print 'No such directory:', matdir
+        print('No such directory:', matdir)
         exit()
 
     tmp = False
@@ -214,7 +215,7 @@ if __name__ == '__main__':
             outdir = npzdir
         elif matdir:
             outdir = matdir
-            
+
         if feat == 'mel':
             del config['features']
             encoder = spectral.CubicMel(**config)
@@ -229,8 +230,13 @@ if __name__ == '__main__':
             oc = Oct2Py(logger=get_log())
             oc.logger = get_log('new_log')
             oc.logger.setLevel(logging.INFO)
-            oc.call("features", files, outdir, feat, config_file, force,
-                    verbose=True)
+            oc.addpath('./features_extraction',
+                       './features_extraction/ltfat',
+                       './features_extraction/amtoolbox',
+                       './features_extraction/jsonlab',
+                       './features_extraction/rastamat')
+            oc.features(files, outdir, feat, config_file, force)
+
             if npzdir:
                 outdir2 = npzdir
             else:
@@ -241,3 +247,7 @@ if __name__ == '__main__':
     finally:
         if tmp:
             shutil.rmtree(outdir)
+
+
+if __name__ == '__main__':
+    main()

@@ -8,34 +8,48 @@ import os
 import logging
 import shlex
 import numpy as np
-import struct
 from kaldi_io import *
+import argparse
+import json
 # assert find_executable('compute-mfcc-feats'), "kaldi 'featsbin' not in the PATH"
 
 logging.basicConfig(level=logging.INFO)
 
 
-# files = ['/home/roland/features_extraction/test/wavs/s_f101_ba.wav']
 import glob
 files = glob.glob('/fhgfs/bootphon/scratch/roland/zerospeech2015/english_wavs/*.wav')[:2]
-def run(files, batch_size=5):
+output_path = '/fhgfs/bootphon/scratch/roland/zerospeech2015/english_feats/mfcc39pitch3_npz/'
+def run(files, output_path, config_file, save, batch_size=50):
     """Split in the file list into batches. Handle arguments.
 
     Parameters:
     -----------
     batch_size: int, max batch size in number of files (adjust for RAM usage)
     """
+    if 'h5' in save:
+        import h5features
+    # with open(config_file, 'r') as fid:
+    #     config = json.load(fid)
+    if config_file:
+        raise NotImplementedError
+
     batches = [files[i:i + batch_size] for i in range(0, len(files), batch_size)]
     res = {}
     for files_batch in batches:
-        res.update(extract_features(files_batch, delta=0, pitch=True))
-    output_path = '/fhgfs/bootphon/scratch/roland/zerospeech2015/english_feats/mfcc39pitch3_npz/'
-    for f in res:
-        np.save(output_path + f, res[f])
+        new_res = extract_features(files_batch, delta=0)
+        if 'np' in save:
+            for f in new_res:
+                np.save(output_path + f, new_res[f])
+        if 'h5' in save:
+            h5features.write(output_path, 'features', [new_res.values()],
+                             map(lambda f: os.path.basename(f).split('.')[0],
+                                 new_res.keys()),
+                             map(lambda d: np.arange(d.shape[0], dtype=float) / 100 + 0.0125))
+        res.update(new_res)
 
 
 def extract_features(files, feature_type='mfcc', normalize=False,
-                     delta=0, pitch=False, vtln=False, spk2utt=None,
+                     delta=2, pitch=False, vtln=False, spk2utt=None,
                      config_file=None):
     """Extract speech features using kaldi
 
@@ -71,7 +85,30 @@ def extract_features(files, feature_type='mfcc', normalize=False,
         return mfccs
     finally:
         tryremove(scpfn)
-        
+
+
+
+def extract_pitch(files, normalize=False,
+                  delta=2, pitch=False):
+    """Extract speech features using kaldi
+
+    Parameters:
+    files: list
+    normalize: bool, do mean variance normalization
+    delta: int, [0..2], 0 -> no deltas, 1 -> do deltas, 2 -> do delta+deltasdeltas
+    """
+    try:
+        # writing 'file path' in a .scp file for kaldi
+        def get_fname(path):
+            return os.path.basename(path).split('.')[0]
+        (scpid, scpfn) = tempfile.mkstemp()
+        with open(scpfn, 'w') as fout:
+            fout.write('\n'.join((' '.join([get_fname(f), f]) for f in files)))
+        pitches = compute_pitch(scpfn, delta)
+        return pitches
+    finally:
+        tryremove(scpfn)
+
 
 def tryremove(path):
     try:
@@ -122,5 +159,75 @@ def extract_mfccs(scpfile, delta=0):
         tryremove(outfn)
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        prog='features.py',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description='Extract Mel spectral features from audio files.',
+        epilog="""Example usage:
+
+$ python features.py -f test/wavs/*.wav -c mel_config.json
+
+extracts features from audio files in current directory.\n
+
+The output format is binary .npz. Each file contains two arrays, one holding
+the features, the other the center times (in seconds) of the frames. To load
+these files in python:
+
+>>> import numpy as np
+>>> data = np.load('/path/to/file.npz')
+>>> features = data['features']
+>>> center_times = data['time']
+""")
+    parser.add_argument('files', metavar='WAV',
+                        nargs='+',
+                        help='input audio files')
+    parser.add_argument('-h5',
+                        action='store',
+                        dest='h5_output',
+                        required=False,
+                        help='output file in h5 format.\n'
+                             ' This is the default output format')
+    parser.add_argument('-npz',
+                        action='store',
+                        dest='npz_output',
+                        required=False,
+                        help='output directory in npz format.\n'
+                             'only precise it if you want to use the numpy '
+                             'matrices directly')
+    parser.add_argument('-mat',
+                        action='store',
+                        dest='mat_output',
+                        required=False,
+                        help='output directory in matlab format.\n'
+                             'Only precise it if you want to use the matlab '
+                             'matrices directly')
+    parser.add_argument('-c', '--config',
+                        action='store',
+                        dest='config',
+                        # required=True,
+                        help='configuration file.\n'
+                             'Contains the type of features to extract and the'
+                             ' parameters in json format. See the default '
+                             'config files for examples:\n'
+                             'mel_config.json, mfcc_config.json, '
+                             'rasta_config.json, lyon_config.json, '
+                             'drnl_config.json')
+    return vars(parser.parse_args())
+
+
 if __name__ == '__main__':
-    run(files)
+    args = parse_args()
+    config_file = args['config']
+    # force = args['force']
+    # feat = config['features']
+    files = args['files']
+    h5file = args['h5_output']
+    npzdir = args['npz_output']
+    save = set()
+    if h5file:
+        save.add('h5')
+    if npzdir:
+        save.add('np')
+
+    run(files, output_path, config_file, save)
