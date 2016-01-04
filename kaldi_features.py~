@@ -1,0 +1,41 @@
+"""Extracting features with kaldi
+"""
+
+import distutils.spawn.find_executable as find_executable
+import subprocess
+import tempfile
+
+assert find_executable('compute-mfcc-feats'), "kaldi 'featsbin' not in the PATH"
+
+
+def run():
+    pass
+
+
+def extract_features(files, feature_type='mfcc', normalize=False,
+                     delta=0, pitch=False):
+    """Extract speech features using kaldi
+
+    Parameters:
+    files: list
+    feature_type: {'mfcc', 'plp'}
+    normalize: bool, do mean variance normalization
+    delta: int, [0..2], 0 -> no deltas, 1 -> do deltas, 2 -> do deltasdeltas
+    pitch: bool, compute pitch
+    """
+    raise NotImplementedError
+
+
+def extract_mfccs(files):
+    #TODO write configfile from args
+    try:
+        (scpid, scpfn) = tempfile.mkstemp()
+        scpid.write('\n'.join(files))
+        scpid.close()
+        (outid, outfn) = tempfile.mkstemp()
+        subprocess.check_call('compute-mfcc-feats', scp,p:scpfn, ark:-, '|',
+                              'copy-feats', ark:-, ark,t:outfn)
+    finally:
+        os.remove(scpfn)
+        os.remove(outfn)
+    raise NotImplementedError

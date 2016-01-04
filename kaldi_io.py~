@@ -1,14 +1,10 @@
 """numpy-kaldi i/o interface
 """
-import logging
-import struct
-import numpy as np
-
 
 def ark2dict(arkfile):  # bufferized version
-    """Kaldi archive (ark) to dictionnary of numpy arrays (~npz)
+    """Kaldi ark format for features to dictionnary of numpy arrays (~npz)
 
-    ..note: Only standard features files supported, and float (no doubles)
+    Only standard features files supported, and float (no doubles)
     """
     res = {}
     with open(arkfile) as fin:
