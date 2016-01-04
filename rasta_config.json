@@ -1,8 +1,8 @@
 {
     "features": "rasta",
-	"wlen": 0.025,
-	"frate": 100,
-	"fs": 16000,
-	"dorasta": 1,
-	"modelorder": 12
+    "wlen": 0.025,
+    "frate": 100,
+    "fs": 16000,
+    "dorasta": 1,
+    "modelorder": 12
 }

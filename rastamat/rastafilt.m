@@ -23,8 +23,8 @@ denom = [1 -0.94];
 % .. but don't keep any of these values, just output zero at the beginning
 y = 0*y';
 
-## size(z)
-## size(x)
+% size(z)
+% size(x)
 
 % Apply the full filter to the rest of the signal, append it
 y = [y,filter(numer, denom, x(:,5:end)',z,1)'];
