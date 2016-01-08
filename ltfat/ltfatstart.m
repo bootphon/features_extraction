@@ -185,7 +185,7 @@ if ltfatstartprint
                     'For help, please type "ltfathelp". %s'], ...
                    ltfat_version,backend);
   
-  disp(banner);
+  %disp(banner);
   
   if exist('ltfat_binary_notes.m','file')
     ltfat_binary_notes;    
@@ -204,5 +204,4 @@ ltfatsetdefaults('ltfathelp','versiondata',ltfat_version,...
 % Force the loading of FFTW, necessary for Matlab 64 bit on Linux. Thanks
 % to NFFT for this trick.
 fft([1,2,3,4]);
-
 

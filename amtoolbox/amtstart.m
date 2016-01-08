@@ -28,7 +28,7 @@ function amtstart()
 %     P. L. Søndergaard, B. Torrésani, and P. Balazs. The Linear Time
 %     Frequency Analysis Toolbox. International Journal of Wavelets,
 %     Multiresolution Analysis and Information Processing, 10(4), 2012.
-%     
+%
 %
 %   Url: http://amtoolbox.sourceforge.net/doc//amtstart.php
 
@@ -47,11 +47,11 @@ function amtstart()
 %
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  
-%   AUTHOR : Peter L. Søndergaard.  
+
+%   AUTHOR : Peter L. Søndergaard.
 
 % Verify that LTFAT has been installed
-if ~exist('ltfatarghelper','file')  
+if ~exist('ltfatarghelper','file')
     disp('');
     disp('--- AMTOOLBOX - The Auditory Modelling toolbox. ---');
     disp('')
@@ -92,7 +92,7 @@ if major_rq*1000000+minor_rq*1000+bugfix_rq>major_no*1000000+minor_no*1000+ ...
   error(['Your version of LTFAT is too old for this version of AMToolbox ' ...
          'to function proberly. Your need at least version %i.%i.%i of LTFAT.'],major_rq,minor_rq,bugfix_rq);
 end;
-          
+
 % --- general settings ---
 % Print the banner at startup?
 printbanner=1;
@@ -139,9 +139,9 @@ for ii=1:length(d)
     if ~(d(ii).name(1)=='.')
 
       name=d(ii).name;
-      
+
       % The file is a directory and it does not start with '.' This could
-      % be a module      
+      % be a module
       if exist([bp,name,filesep,name,'init.m'],'file')
 	% Set 'status' to zero if the module forgets to define it.
 	status=0;
@@ -158,7 +158,7 @@ for ii=1:length(d)
 	else
 	  rmpath([bp,name]);
 	end;
-      end;	
+      end;
 
     end;
   end;
@@ -175,9 +175,9 @@ end;
 %  end;
 %end;
 
-if printbanner
-  disp(['AMT version ',amt_version,'. Copyright 2012 Peter L. Søndergaard. For help, please type "amthelp".'])
-end;
+## if printbanner
+##   disp(['AMT version ',amt_version,'. Copyright 2012 Peter L. Søndergaard. For help, please type "amthelp".'])
+## end;
 
 
 
@@ -186,4 +186,3 @@ end;
 % As comp is now in the path, we can call ltfatarghelper
 ltfatsetdefaults('amthelp','versiondata',amt_version,...
                  'modulesdata',modules);
-
