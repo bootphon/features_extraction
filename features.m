@@ -2,14 +2,14 @@ function [] = features(wavfiles, out_folder, feat, config, force);
 
 pkg load signal;
 
-addpath('ltfat');
-addpath('amtoolbox');
-ltfatstart;
+%addpath('ltfat');
+#addpath('amtoolbox');
+ltfatstart(0, 'nojava');
 amtstart;
 
-addpath('jsonlab');
+%addpath('jsonlab');
 conf = loadjson(config);
-rmpath('jsonlab');
+%rmpath('jsonlab');
 
 for idx = 1:numel(wavfiles)
   wavfile = wavfiles{idx};
@@ -35,12 +35,12 @@ for idx = 1:numel(wavfiles)
   % set loudness such that loudness of vowel is at 50dB
   ref_lvl = 50;
   sig = gaindb(sig/rms(sig),ref_lvl-dbspl(1));
-  
+
   out_file = strcat(out_folder, basename);
 
   if strcmp(feat, 'rasta')
-      %addpath('rastamat');            
-      %fprintf('\trasta-plp\n');           
+      %addpath('rastamat');
+      %fprintf('\trasta-plp\n');
       sig2rasta(sig, fs, out_file, conf);
       %rmpath('rastamat');
 

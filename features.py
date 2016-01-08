@@ -18,21 +18,22 @@
 from __future__ import division
 
 import argparse
+import glob
 import json
+import logging
+import numpy as np
+import oct2py
 import os.path as path
 import os
-import wave
-import struct
-
-import numpy as np
-
-import spectral
-import logging
-import npz2h5features
-import shutil
 import scipy.io
-import glob
+import shutil
+import spectral
+import struct
+import sys
 import tempfile
+import wave
+
+import npz2h5features
 
 
 def resample(sig, ratio):
@@ -44,14 +45,14 @@ def resample(sig, ratio):
         return scipy.signal.resample(sig, int(round(sig.shape[0] * ratio)))
 
 
-def parse_args():
+def parse_args(args=sys.argv):
     parser = argparse.ArgumentParser(
         prog='features.py',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description='Extract Mel spectral features from audio files.',
         epilog="""Example usage:
 
-$ python features.py -f test/wavs/*.wav -c mel_config.json
+$ python features.py test/wavs/*.wav -c mel_config.json
 
 extracts features from audio files in current directory.\n
 
@@ -107,7 +108,7 @@ these files in python:
                              'make the samplerate uniform among the files. '
                              'If you want to resample every file, you should '
                              'do it before running the program.')
-    return vars(parser.parse_args())
+    return vars(parser.parse_args(args))
 
 
 def convert(files, outdir, encoder, force):
@@ -174,8 +175,8 @@ def mat2npz(indir, outdir):
                  time=np.ravel(mat['center_times']))
 
 
-def main():
-    args = parse_args()
+def main(args=sys.argv):
+    args = parse_args(args)
     config_file = args['config']
     try:
         with open(config_file, 'r') as fid:
@@ -186,10 +187,14 @@ def main():
 
     force = args['force']
     feat = config['features']
-    files = args['files']
     h5file = args['h5_output']
     npzdir = args['npz_output']
     matdir = args['mat_output']
+    files = args['files']
+    # TODO strange bug from parsing where files[0] == __file__
+    if files[0][-3:] == '.py':
+        del files[0]
+    # print('\n'.join(files))
 
     if not (h5file or npzdir or matdir):
         h5file = feat + '.features'
@@ -225,18 +230,21 @@ def main():
             encoder = spectral.MFCC(**config)
             convert(files, outdir, encoder, force)
         else:
-            from oct2py import octave
-            from oct2py import Oct2Py, get_log
-            oc = Oct2Py(logger=get_log())
-            oc.logger = get_log('new_log')
-            oc.logger.setLevel(logging.INFO)
+            print 'Delegation to GNU octave: ', feat
+            # from oct2py import Oct2Py, get_log
+            # oc = Oct2Py(logger=get_log())
+            # oc.logger = get_log('new_log')
+            # oc.logger.setLevel(logging.INFO)
+            oc = oct2py.Oct2Py()
+            print 'octave version', oc.version()
             oc.addpath('./features_extraction',
                        './features_extraction/ltfat',
                        './features_extraction/amtoolbox',
                        './features_extraction/jsonlab',
-                       './features_extraction/rastamat')
-            oc.features(files, outdir, feat, config_file, force)
-
+                       './features_extraction/rastamat',
+                       './features_extraction/AuditoryToolbox')
+            oc.features(files, outdir, feat, config_file, force, verbose=True)
+            print 'Done with GNU octave'
             if npzdir:
                 outdir2 = npzdir
             else:
@@ -244,6 +252,8 @@ def main():
             mat2npz(outdir, outdir2)
         if h5file:
             npz2h5features.convert(outdir, h5file)
+    except oct2py.Oct2PyError as err:
+        print err
     finally:
         if tmp:
             shutil.rmtree(outdir)
