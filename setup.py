@@ -12,7 +12,7 @@ setup(name='features_extraction',
       long_description=open('README.md').read(),
       dependency_links = ['http://github.com/bootphon/spectral/tarball/master/#egg=mwv-spectral'],
       install_requires=[
-          "mwv-spectral",
+          "spectral>=0.2",
           "h5features",
       ],
   )
