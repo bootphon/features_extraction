@@ -65,15 +65,18 @@ these files in python:
 >>> features = data['features']
 >>> center_times = data['time']
 """)
+
     parser.add_argument('files', metavar='WAV',
                         nargs='+',
                         help='input audio files')
+
     parser.add_argument('-h5',
                         action='store',
                         dest='h5_output',
                         required=False,
                         help='output file in h5 format.\n'
                              ' This is the default output format')
+
     parser.add_argument('-npz',
                         action='store',
                         dest='npz_output',
@@ -81,6 +84,7 @@ these files in python:
                         help='output directory in npz format.\n'
                              'only precise it if you want to use the numpy '
                              'matrices directly')
+
     parser.add_argument('-mat',
                         action='store',
                         dest='mat_output',
@@ -88,6 +92,7 @@ these files in python:
                         help='output directory in matlab format.\n'
                              'Only precise it if you want to use the matlab '
                              'matrices directly')
+
     parser.add_argument('-c', '--config',
                         action='store',
                         dest='config',
@@ -99,6 +104,7 @@ these files in python:
                              'mel_config.json, mfcc_config.json, '
                              'rasta_config.json, lyon_config.json, '
                              'drnl_config.json')
+
     parser.add_argument('-f', '--force',
                         action='store_true',
                         dest='force',
@@ -108,11 +114,21 @@ these files in python:
                              'make the samplerate uniform among the files. '
                              'If you want to resample every file, you should '
                              'do it before running the program.')
+
+    parser.add_argument('-v', '--verbose',
+                        action='store_true',
+                        help='display some log messages to stdout')
+
+    parser.add_argument('--tempdir', default='/tmp',
+                        help='directory where to write temp files (erased after execution). '
+                        'Default is to write to /tmp')
     return vars(parser.parse_args(args))
 
 
-def convert(files, outdir, encoder, force):
-    for f in files:
+def convert(files, outdir, encoder, force, verbose=False):
+    if verbose:
+        print 'computing features for {} wav files'.format(len(files))
+    for n, f in enumerate(files):
         try:
             fid = wave.open(f, 'r')
             _, _, fs, nframes, _, _ = fid.getparams()
@@ -135,24 +151,29 @@ def convert(files, outdir, encoder, force):
                 exit()
 
         feats = encoder.transform(sig)[0]
-        bname = path.splitext(path.basename(f))[0]
+
         wshift_smp = encoder.config['fs'] / encoder.config['frate']
         wlen_smp = encoder.config['wlen'] * encoder.config['fs']
         nframes = int(sig.shape[0] / wshift_smp + 1)
         if nframes != feats.shape[0]:
             raise ValueError('nframes mismatch. expected {0}, got {1}'
                              .format(feats.shape[0], nframes))
+
         center_times = np.zeros((nframes,))
         for fr in range(nframes):
             start_smp = round(fr * wshift_smp)
-            end_smp = min(sig.shape[0],
-                          start_smp + wlen_smp)
+            end_smp = min(sig.shape[0], start_smp + wlen_smp)
             start_ms = start_smp / fs
             end_ms = end_smp / fs
             center_times[fr] = (start_ms + end_ms) / 2
+
+        bname = path.splitext(path.basename(f))[0]
         np.savez(path.join(outdir, bname + '.npz'),
                  features=feats,
                  time=center_times)
+
+        if verbose:
+            print 'done {}/{} : {}'.format(n+1, len(files), bname)
 
 
 def center_times(fs, wshift_smp, wlen_smp, sig_len):
@@ -191,6 +212,9 @@ def main(args=sys.argv):
     npzdir = args['npz_output']
     matdir = args['mat_output']
     files = args['files']
+    verbose = args['verbose']
+    tempdir = args['tempdir']
+
     # TODO strange bug from parsing where files[0] == __file__
     if files[0][-3:] == '.py':
         del files[0]
@@ -214,8 +238,11 @@ def main(args=sys.argv):
     octave = (feat == 'rasta' or feat == 'lyon' or feat == 'drnl')
     try:
         if (python and not npzdir) or (octave and not matdir):
-            outdir = tempfile.mkdtemp()
+            outdir = tempfile.mkdtemp(dir=tempdir)
             tmp = True
+            if verbose:
+                print 'writing to tempdir {}'.format(outdir)
+
         elif python:
             outdir = npzdir
         elif matdir:
@@ -224,34 +251,45 @@ def main(args=sys.argv):
         if feat == 'mel':
             del config['features']
             encoder = spectral.CubicMel(**config)
-            convert(files, outdir, encoder, force)
+            convert(files, outdir, encoder, force, verbose)
         elif feat == 'mfcc':
             del config['features']
             encoder = spectral.MFCC(**config)
-            convert(files, outdir, encoder, force)
+            convert(files, outdir, encoder, force, verbose)
         else:
-            print 'Delegation to GNU octave: ', feat
+            if verbose:
+                print 'Delegation to GNU octave: ', feat
+
             # from oct2py import Oct2Py, get_log
             # oc = Oct2Py(logger=get_log())
             # oc.logger = get_log('new_log')
             # oc.logger.setLevel(logging.INFO)
             oc = oct2py.Oct2Py()
-            print 'octave version', oc.version()
+
+            if verbose:
+                print 'octave version', oc.version()
+
             oc.addpath('./features_extraction',
                        './features_extraction/ltfat',
                        './features_extraction/amtoolbox',
                        './features_extraction/jsonlab',
                        './features_extraction/rastamat',
                        './features_extraction/AuditoryToolbox')
-            oc.features(files, outdir, feat, config_file, force, verbose=True)
-            print 'Done with GNU octave'
+
+            oc.features(files, outdir, feat, config_file, force, verbose=verbose)
+
+            if verbose:
+                print 'Done with GNU octave'
+
             if npzdir:
                 outdir2 = npzdir
             else:
                 outdir2 = outdir
             mat2npz(outdir, outdir2)
+
         if h5file:
             npz2h5features.convert(outdir, h5file)
+
     except oct2py.Oct2PyError as err:
         print err
     finally:
