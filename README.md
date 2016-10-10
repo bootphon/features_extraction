@@ -9,21 +9,34 @@ you can install **feature_extraction** within the cli:
 If you are installing from source using conda  and
 dependences are not installed you can do:
 
-- get **feature_extraction** from github:
+Gget **feature_extraction** from github:
+```
+>> git clone https://github.com/bootphon/features_extraction
+```
 
-    git clone https://github.com/bootphon/features_extraction
+Create your environment, for example if using conda
 
-- create your environment, for example if using conda
+```
+>> cd features_extraction
+>> conda create --name feat --file requirements.txt
+>> source activate feat
+```
 
-    cd features_extraction
-    conda create --name feat --file requirements.txt 
-    source activate feat
+Install other dependences that are not available with conda
+```
+(feat) >> pip install oct2py   
+(feat) >> pip install git+http://github.com/bootphon/spectral
+(feat) >> pip install git+https://github.com/bootphon/h5features    
+```
 
-- install other dependences that are not available with conda
+If you are working from the source code, you will need to 
+include **features_extraction** in your path, in bash/linux:
 
-    (feat) pip install git+http://github.com/bootphon/spectral
-    (feat) pip install git+https://github.com/bootphon/h5features    
-
+```
+>> export PATH=$PATH:{DIR_FEATURES_EXTRACTION}
+>> export PYTHONPATH=$PYTHONPATH:{DIR_FEATURES_EXTRACTION}
+>> chmod 755 features.py
+```
 
 
 Dependecies
@@ -49,9 +62,11 @@ the octaves packages: **general**, **control** and **signal**.
 To install the packages, from octave's console line you'll need
 to run:
 
+```
 >> pkg install -forge general
 >> pkg install -forge control
 >> pkg install -forge signal
+```
 
 AuditoryToolbox depends on compiled octave/matlab mex files, to 
 create these file you will need to compile the files within the 
@@ -69,7 +84,9 @@ center_times in some octave features are wrong...
 
 
 Example:
+```
+python features.py test/wavs/*.wav -h5 my_mfccs.h5f -c mfcc_config.json
+```
 
-	python features.py test/wavs/*.wav -h5 my_mfccs.h5f -c mfcc_config.json
 
 see config options at config_doc.rst
