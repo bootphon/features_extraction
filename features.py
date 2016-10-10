@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # ------------------------------------
@@ -34,6 +34,7 @@ import tempfile
 import wave
 
 import npz2h5features
+import npz2csv
 
 
 def resample(sig, ratio):
@@ -76,6 +77,13 @@ these files in python:
                         required=False,
                         help='output file in h5 format.\n'
                              ' This is the default output format')
+
+    parser.add_argument('-csv', 
+                        action='store',                            
+                        dest='csv_output',                          
+                        required=False,                            
+                        help='output file in csv format.\n') 
+
 
     parser.add_argument('-npz',
                         action='store',
@@ -209,6 +217,7 @@ def main(args=sys.argv):
     force = args['force']
     feat = config['features']
     h5file = args['h5_output']
+    csvfile = args['csv_output']
     npzdir = args['npz_output']
     matdir = args['mat_output']
     files = args['files']
@@ -220,17 +229,20 @@ def main(args=sys.argv):
         del files[0]
     # print('\n'.join(files))
 
-    if not (h5file or npzdir or matdir):
+    if not (h5file or csvfile or npzdir or matdir):
         h5file = feat + '.features'
 
     if h5file and os.path.exists(h5file):
-        print('The output file already exists:', h5file)
+        print('The output file already exists: {}'.format(h5file))
+        exit()
+    if csvfile and os.path.exists(csvfile):
+        print('The output file already exists: {}'.format(csvfile)) 
         exit()
     if npzdir and not os.path.exists(npzdir):
-        print('No such directory:', npzdir)
+        print('No such directory: {}'.format(npzdir))
         exit()
     if matdir and not os.path.exists(matdir):
-        print('No such directory:', matdir)
+        print('No such directory: {}'.format(matdir))
         exit()
 
     tmp = False
@@ -289,6 +301,10 @@ def main(args=sys.argv):
 
         if h5file:
             npz2h5features.convert(outdir, h5file)
+
+        if csvfile:
+            npz2csv.convert(outdir, csvfile)
+
 
     except oct2py.Oct2PyError as err:
         print err
