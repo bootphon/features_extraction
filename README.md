@@ -1,30 +1,67 @@
 Installation:
+============
 
-	python setup.py build && python setup.py install
+In short if all dependences are installed on the system 
+you can install **feature_extraction** within the cli:
 
-Uses:
+>> python setup.py build && python setup.py install
+
+If you are installing from source using conda  and
+dependences are not installed you can do:
+
+- get **feature_extraction** from github:
+
+>> git clone https://github.com/bootphon/features_extraction
+
+- create your environment, for example if using conda
+
+>> cd features_extraction
+>> conda create --name feat --file requirements.txt 
+>> source activate feat
+
+- install other dependences that are not available with conda
+
+(feat) >> pip install git+http://github.com/bootphon/spectral
+(feat) >> pip install git+https://github.com/bootphon/h5features    
+
+
+
+Dependecies
+===========
+
+python dependences:
 
 - spectral
 - h5features
 - octave
+
+octave dependences:
+
 - ltfat
 - amtoolbox
 - rastamat
 - signal (octave package), require control and general
 - AuditoryToolbox
 
+To run rastama the previous packages you will need a 
+working octave's distribution, these packages depends of 
+the octaves packages: **general**, **control** and **signal**.
+To install the packages, from octave's console line you'll need
+to run:
 
-For the octave part:
+>> pkg install -forge general
+>> pkg install -forge control
+>> pkg install -forge signal
 
-install octave
-run octave
-pkg install -forge general
-pkg install -forge control
-pkg install -forge signal
-install AuditoryToolbox (makefile in src)
+AuditoryToolbox depends on compiled octave/matlab mex files, to 
+create these file you will need to compile the files within the 
+AuditoryToolbox directory, in linux command line **on** AuditoryToolbox/src
+directory do:
 
+>> make 
 
-Note:
+Notes
+=====
 
 for now, octave features dont have many options since they are hard coded.
 .mat output for python features not implemented yet
