@@ -4,25 +4,25 @@ Installation:
 In short if all dependences are installed on the system 
 you can install **feature_extraction** within the cli:
 
->> python setup.py build && python setup.py install
+    python setup.py build && python setup.py install
 
 If you are installing from source using conda  and
 dependences are not installed you can do:
 
 - get **feature_extraction** from github:
 
->> git clone https://github.com/bootphon/features_extraction
+    git clone https://github.com/bootphon/features_extraction
 
 - create your environment, for example if using conda
 
->> cd features_extraction
->> conda create --name feat --file requirements.txt 
->> source activate feat
+    cd features_extraction
+    conda create --name feat --file requirements.txt 
+    source activate feat
 
 - install other dependences that are not available with conda
 
-(feat) >> pip install git+http://github.com/bootphon/spectral
-(feat) >> pip install git+https://github.com/bootphon/h5features    
+    (feat) pip install git+http://github.com/bootphon/spectral
+    (feat) pip install git+https://github.com/bootphon/h5features    
 
 
 
