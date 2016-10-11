@@ -14,7 +14,7 @@ Gget **feature_extraction** from github:
 >> git clone https://github.com/bootphon/features_extraction
 ```
 
-Create your environment, for example if using conda
+Create your environment, for example if using conda (using the python 2.7 64-BIT from https://www.continuum.io/downloads)
 
 ```
 >> cd features_extraction
