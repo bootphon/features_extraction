@@ -33,11 +33,11 @@ If you are working from the source code, you will need to
 include **features_extraction** in your path, in bash/linux:
 
 ```
->> export PATH=$PATH:{DIR_FEATURES_EXTRACTION}
->> export PYTHONPATH=$PYTHONPATH:{DIR_FEATURES_EXTRACTION}
+>> export PATH=$PATH:[DIR_FEATURES_EXTRACTION]
+>> export PYTHONPATH=$PYTHONPATH:[DIR_FEATURES_EXTRACTION]
 >> chmod 755 features.py
 ```
-
+Where [DIR_FEATURES_EXTRACTION] is the directory where feature_extraction source code is keep.
 
 Dependecies
 ===========
