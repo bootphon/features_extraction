@@ -1,3 +1,6 @@
+**This package is deprecated and is no more maintained, 
+please use shennong instead: https://github.com/bootphon/shennong**
+
 Installation:
 ============
 
